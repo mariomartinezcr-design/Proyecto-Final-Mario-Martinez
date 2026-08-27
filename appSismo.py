@@ -50,8 +50,6 @@ def menu_principal() -> None:
     print("========================")
 
 
-# Ejecuta la opción elegida por el usuario y repite hasta salir
-
 def ejecutar_menu(df) -> None:
     while True:
         menu_principal()

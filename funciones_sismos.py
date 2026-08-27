@@ -26,43 +26,29 @@ def obtener_columna(df: pd.DataFrame, nombres: list[str]) -> str:
     raise KeyError(f"No se encontro ninguna de estas columnas: {alternativas}")
 
 
-# Devuelve un resumen textual del total anual de sismos
-# Incluye cantidad total, magnitud máxima y profundidad máxima
+# Devuelve un reporte del ultimo sismo sentido del año
 
 def resumen_anual(df: pd.DataFrame) -> str:
     magnitud_col = obtener_columna(df, ["magnitud", "magnitude", "mag"])
     profundidad_col = obtener_columna(df, ["profundidad", "depth", "profundidadkm", "profundidad_km"])
     fecha_col = obtener_columna(df, ["fecha", "fecha_hora", "date", "datetime", "hora", "fechayhora"])
+    localizacion_col = obtener_columna(df, ["localizacion", "ubicacion", "lugar", "region", "zona", "localidad", "provincia"])
 
     total = len(df)
     magnitudes = pd.to_numeric(df[magnitud_col], errors="coerce")
     profundidades = pd.to_numeric(df[profundidad_col], errors="coerce")
     fechas = pd.to_datetime(df[fecha_col], errors="coerce")
 
-    magnitud_max = magnitudes.max()
-    profundidad_max = profundidades.max()
     indice_fecha_max = fechas.idxmax()
-    fecha_max = df.loc[indice_fecha_max, fecha_col]
-    ultimo_magnitud = magnitudes.loc[indice_fecha_max]
-    ultimo_profundidad = profundidades.loc[indice_fecha_max]
-    media_magnitud = magnitudes.mean()
-    media_profundidad = profundidades.mean()
-
-    def comparar(valor: float, media: float) -> str:
-        if valor > media:
-            return "por encima"
-        if valor < media:
-            return "por debajo"
-        return "igual"
+    magnitud_ultimo = magnitudes.loc[indice_fecha_max]
+    profundidad_ultimo = profundidades.loc[indice_fecha_max]
+    localizacion_ultima = df.loc[indice_fecha_max, localizacion_col]
 
     return (
-        "\nResumen anual:\n"
-        f"- Este es el sismo numero {total} del año.\n"
-        f"- Magnitud máxima: {magnitud_max}\n"
-        f"- Profundidad máxima: {profundidad_max}\n"
-        f"- Fecha del sismo más fuerte: {fecha_max}\n"
-        f"- El último sismo sentido está {comparar(ultimo_magnitud, media_magnitud)} de la media en magnitud.\n"
-        f"- El último sismo sentido está {comparar(ultimo_profundidad, media_profundidad)} de la media en profundidad.\n"
+        f"Este es el sismo numero {total} del ano.\n"
+        f"- Magnitud: {magnitud_ultimo}\n"
+        f"- Profundidad: {profundidad_ultimo}\n"
+        f"- Localizacion: {localizacion_ultima}\n"
     )
 
 
@@ -72,9 +58,12 @@ def resumen_anual(df: pd.DataFrame) -> str:
 def comparar_con_media(df: pd.DataFrame) -> str:
     magnitud_col = obtener_columna(df, ["magnitud", "magnitude", "mag"])
     profundidad_col = obtener_columna(df, ["profundidad", "depth", "profundidadkm", "profundidad_km"])
+    fecha_col = obtener_columna(df, ["fecha", "fecha_hora", "date", "datetime", "hora", "fechayhora"])
 
     magnitudes = pd.to_numeric(df[magnitud_col], errors="coerce")
     profundidades = pd.to_numeric(df[profundidad_col], errors="coerce")
+    fechas = pd.to_datetime(df[fecha_col], errors="coerce")
+    indice_fecha_max = fechas.idxmax()
 
     media_magnitud = magnitudes.mean()
     media_profundidad = profundidades.mean()
@@ -85,7 +74,9 @@ def comparar_con_media(df: pd.DataFrame) -> str:
     por_debajo_profundidad = (profundidades < media_profundidad).sum()
 
     return (
-        "\nComparacion con la media:\n"
+        "\nComparativa anual del sismo sentido:\n"
+        f"- Magnitud de sismo sentido: {magnitudes.loc[indice_fecha_max]}\n"
+        f"- Profundidad de sismo sentido: {profundidades.loc[indice_fecha_max]}\n"
         f"- Media de magnitud: {media_magnitud:.2f}\n"
         f"- Sismos por encima de la media: {por_encima_magnitud}\n"
         f"- Sismos por debajo de la media: {por_debajo_magnitud}\n"
