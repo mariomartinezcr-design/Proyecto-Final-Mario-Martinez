@@ -1,4 +1,4 @@
-# Informe del proyecto: Sistema de análisis de sismos
+# Informe del proyecto:
 
 ## 1. Introducción
 
